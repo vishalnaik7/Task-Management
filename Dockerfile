@@ -1,27 +1,38 @@
-# Use PHP-FPM base image
-FROM php:8.2-fpm
-
-# Install dependencies
-RUN apt-get update && apt-get install -y nginx supervisor unzip git curl
+# Use an official PHP image with Apache
+FROM php:8.1-apache
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel project files
-COPY . .
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install gd pdo pdo_mysql mysqli
 
-# Set correct permissions
-RUN chmod -R 775 storage bootstrap/cache
+# Enable Apache mod_rewrite for Laravel
+RUN a2enmod rewrite
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy Laravel files
+COPY . .
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Expose necessary ports
-EXPOSE 80 9000
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copy Nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Expose port 80 for Apache
+EXPOSE 80
 
-# Start PHP-FPM and Nginx
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+# Start Apache
+CMD ["apache2-foreground"]
