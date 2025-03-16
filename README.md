@@ -10,8 +10,7 @@ This is a Mini Task Management System built using PHP and Laravel. It allows use
 - **Update Task**: Update task details such as title, priority, due date, and status.
 - **Delete Task**: Remove a task from the system.
 - **Validation**: Ensures proper validation for task creation and updates (e.g., title cannot be empty, due date must be in the future).
-- **Pagination**: Tasks are paginated for better performance.
-- **Optional Frontend**: A basic HTML/CSS/jQuery frontend to interact with the API.
+- **Pagination**: Tasks are paginated for better performance. 
 
 ## Database Design
 
