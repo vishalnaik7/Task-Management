@@ -15,22 +15,9 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $query = Task::query();
+        $filters = $request->only(['search', 'priority', 'status']); 
 
-        if ($request->has('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->has('priority')) {
-            $query->where('priority', $request->priority);
-        }
-
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Paginate the results (e.g., 10 tasks per page)
-        $tasks = $query->paginate(1);
+        $tasks = Task::filter($filters)->paginate(10);
 
         return response()->json($tasks);
     }
@@ -41,14 +28,22 @@ class TaskController extends Controller
         return $task ? response()->json($task) : response()->json(['message' => 'Task not found'], 404);
     }
 
-
     public function store(Request $request)
     {
-        $request->validate([
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Please log in to create a task.'], 401);
+        }
+ 
+        $validator = \Validator::make($request->all(), [
             'title' => 'required|string|max:255',
+            'description' => 'required',
             'due_date' => 'required|date|after:today',
             'priority' => ['required', Rule::in(['Low', 'Medium', 'High'])],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $task = Task::create($request->all());
         return response()->json($task, 201);
@@ -60,19 +55,23 @@ class TaskController extends Controller
         if (!$task) {
             return response()->json(['message' => 'Task not found'], 404);
         }
-
-        $request->validate([
+ 
+        $validator = \Validator::make($request->all(), [
             'title' => 'string|max:255',
             'due_date' => 'date|after:today',
             'priority' => Rule::in(['Low', 'Medium', 'High']),
+            'description' => 'required',
             'status' => Rule::in(['Pending', 'Completed']),
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $task->update($request->all());
         return response()->json($task);
     }
 
-   
     public function destroy($id)
     {
         $task = Task::find($id);
