@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,9 +26,7 @@
                     <li class="nav-item" id="loginNavItem">
                         <a class="nav-link" href="#" id="loginNavLink" data-bs-toggle="modal" data-bs-target="#authModal">Login</a>
                     </li>
-                    <li class="nav-item" id="registerNavItem">
-                        <a class="nav-link" href="#" id="registerNavLink" data-bs-toggle="modal" data-bs-target="#authModal">Sign Up</a>
-                    </li>
+                     
                     <li class="nav-item" id="logoutNavItem" style="display: none;">
                         <a class="nav-link" href="#" id="logoutNavLink">Logout</a>
                     </li>
@@ -163,8 +161,7 @@
 
         <!-- Pagination -->
         <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-3" id="pagination">
-                <!-- Pagination links will be dynamically added here -->
+            <ul class="pagination justify-content-center mt-3" id="pagination"> 
             </ul>
         </nav>
     </div>
@@ -219,17 +216,15 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
-    <script>
-        // Single JavaScript file for Task Management System
+    <script> 
 
 const API_BASE = "http://127.0.0.1:8000/api";
-const API_URL = `${API_BASE}/tasks`;
-
-// Helper function to include the JWT token in headers
+const API_URL = `${API_BASE}/tasks`; 
+ 
 function getAuthHeader() {
     const token = localStorage.getItem("token");
     return {
@@ -238,7 +233,6 @@ function getAuthHeader() {
     };
 }
 
-// Fetch all tasks with filtering and pagination
 function fetchTasks(page = 1) {
     let searchQuery = $("#searchInput").val();
     let priority = $("#priorityFilter").val();
@@ -253,8 +247,7 @@ function fetchTasks(page = 1) {
         url: url,
         method: "GET",
         headers: getAuthHeader(),
-        success: function(response) {
-            // Update the task list
+        success: function(response) { 
             let rows = "";
             response.data.forEach(task => {
                 let statusClass = task.status === 'Pending' ? 'bg-warning' : 'bg-success';
@@ -272,40 +265,23 @@ function fetchTasks(page = 1) {
                     </tr>
                 `;
             });
-            $("#taskList").html(rows);
-
-            // Update the pagination controls
+            $("#taskList").html(rows); 
             updatePagination(response);
-        },
-        // error: function(xhr) {
-        //     if (xhr.status === 401) {
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'Unauthorized',
-        //             text: 'Please log in.',
-        //         });
-        //         window.location.href = "/login"; // Redirect to login page
-        //     }
-        // }
+        } 
     });
-}
-
-// Update the pagination controls
+} 
+ 
 function updatePagination(response) {
     let paginationHtml = "";
     const currentPage = response.current_page;
-    const lastPage = response.last_page;
-
-    // Previous Page Button
+    const lastPage = response.last_page; 
     if (currentPage > 1) {
         paginationHtml += `
             <li class="page-item">
                 <a class="page-link" href="#" onclick="fetchTasks(${currentPage - 1})">Previous</a>
             </li>
         `;
-    }
-
-    // Page Numbers
+    } 
     for (let i = 1; i <= lastPage; i++) {
         paginationHtml += `
             <li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -314,7 +290,7 @@ function updatePagination(response) {
         `;
     }
 
-    // Next Page Button
+     
     if (currentPage < lastPage) {
         paginationHtml += `
             <li class="page-item">
@@ -326,7 +302,7 @@ function updatePagination(response) {
     $("#pagination").html(paginationHtml);
 }
 
-// Create a new task
+ 
 function createTask() {
     let task = {
         title: $("#title").val(),
@@ -351,8 +327,7 @@ function createTask() {
             });
         },
         error: function(xhr) {
-            if (xhr.status === 401) {
-                // Show SweetAlert2 popup asking the user to log in
+            if (xhr.status === 401) { 
                 Swal.fire({
                     icon: 'error',
                     title: 'Unauthorized',
@@ -361,13 +336,11 @@ function createTask() {
                     confirmButtonText: 'Log In',
                     cancelButtonText: 'Cancel',
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Redirect to the login page
+                    if (result.isConfirmed) { 
                         document.getElementById("loginNavLink").click();
                     }
                 });
-            } else if (xhr.status === 422) {
-                // Handle validation errors
+            } else if (xhr.status === 422) { 
                 let errors = xhr.responseJSON.errors;
                 let errorMessages = "";
                 for (let field in errors) {
@@ -387,9 +360,8 @@ function createTask() {
             }
         }
     });
-}
-
-// Show the edit modal with task details
+} 
+ 
 function showEditModal(id, title, description, priority, dueDate, status) {
     $("#editTaskId").val(id);
     $("#editTitle").val(title);
@@ -399,8 +371,7 @@ function showEditModal(id, title, description, priority, dueDate, status) {
     $("#editStatus").val(status);
     $("#editTaskModal").modal("show");
 }
-
-// Update a task
+ 
 function updateTask() {
     let id = $("#editTaskId").val();
     let task = {
@@ -426,8 +397,7 @@ function updateTask() {
             });
         },
         error: function(xhr) {
-            if (xhr.status === 422) {
-                // Handle validation errors
+            if (xhr.status === 422) { 
                 let errors = xhr.responseJSON.errors;
                 let errorMessages = "";
                 for (let field in errors) {
@@ -444,26 +414,11 @@ function updateTask() {
                     title: 'Task Not Found',
                     text: 'The task you are trying to update does not exist.',
                 });
-            } 
-            // else if (xhr.status === 401) {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Unauthorized',
-            //         text: 'Please log in.',
-            //     });
-            //     window.location.href = "/login"; // Redirect to login page
-            // } else {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Error',
-            //         text: 'An unexpected error occurred.',
-            //     });
-            // }
+            }  
         }
     });
 }
 
-// Show the delete confirmation modal
 function showDeleteConfirmationModal(id) {
     Swal.fire({
         title: 'Are you sure?',
@@ -494,20 +449,10 @@ function deleteTask(id) {
                 text: 'Your task has been successfully deleted.',
             });
         },
-        // error: function(xhr) {
-        //     if (xhr.status === 401) {
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'Unauthorized',
-        //             text: 'Please log in.',
-        //         });
-        //         window.location.href = "/login"; // Redirect to login page
-        //     }
-        // }
     });
 }
 
-// Update the navbar based on login status
+
 function updateNavbar() {
     const token = localStorage.getItem("token");
     if (token) {
@@ -521,7 +466,7 @@ function updateNavbar() {
     }
 }
 
-// Handle login form submission
+
 $("#loginForm").submit(function(e) {
     e.preventDefault();
     let credentials = {
@@ -541,7 +486,7 @@ $("#loginForm").submit(function(e) {
     });
 });
 
-// Handle register form submission
+
 $("#registerForm").submit(function(e) {
     e.preventDefault();
     let user = {
@@ -549,6 +494,7 @@ $("#registerForm").submit(function(e) {
         email: $("#registerEmail").val(),
         password: $("#registerPassword").val()
     };
+
     $.post(`${API_BASE}/register`, user, function(response) {
         Swal.fire({
             icon: 'success',
@@ -557,11 +503,25 @@ $("#registerForm").submit(function(e) {
         });
         $("#loginTab").click();
     }).fail(function(xhr) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Registration Failed',
-            text: xhr.responseJSON.error,
-        });
+        // Handle validation errors
+        if (xhr.status === 422) { // 422 is the status code for validation errors
+            let errors = xhr.responseJSON.errors;
+            let errorMessage = '';
+            for (let field in errors) {
+                errorMessage += `${errors[field].join('<br>')}\n`;
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: errorMessage, // Use `html` to render line breaks
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: xhr.responseJSON.message || 'An error occurred. Please try again.',
+            });
+        }
     });
 });
 
@@ -571,27 +531,19 @@ $("#logoutNavLink").click(function() {
     window.location.reload(); // Refresh the page to update the UI
 });
 
-// Initialize the page
+ 
 $(document).ready(function() {
     updateNavbar();
-    fetchTasks(); // Fetch tasks on page load
-
-    // Instant filtering for search input
+    fetchTasks(); 
     $("#searchInput").on("input", function() {
-        fetchTasks(1); // Reset to the first page
-    });
-
-    // Instant filtering for priority dropdown
+        fetchTasks(1); 
+    }); 
     $("#priorityFilter").on("change", function() {
-        fetchTasks(1); // Reset to the first page
-    });
-
-    // Instant filtering for status dropdown
+        fetchTasks(1); 
+    }); 
     $("#statusFilter").on("change", function() {
-        fetchTasks(1); // Reset to the first page
-    });
-
-    // Switch between Login and Sign Up tabs
+        fetchTasks(1); 
+    }); 
     $("#loginTab").click(function() {
         $("#loginForm").removeClass("d-none");
         $("#registerForm").addClass("d-none");
